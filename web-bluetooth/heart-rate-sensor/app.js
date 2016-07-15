@@ -6,6 +6,8 @@ statusText.addEventListener('click', function() {
   heartRates = [];
   heartRateSensor.connect()
   .then(() => heartRateSensor.startNotificationsHeartRateMeasurement().then(handleHeartRateMeasurement))
+  .then(() => heartRateSensor.getManufacturerName())
+  .then(result => { console.log('Manufacturer Name: ' + result) })
   .catch(error => {
     statusText.textContent = error;
   });

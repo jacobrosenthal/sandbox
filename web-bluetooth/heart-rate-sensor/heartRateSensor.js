@@ -6,10 +6,12 @@
       this.device = null;
       this.server = null;
       this._characteristics = new Map();
+      this._textDecoder = new TextDecoder();
     }
     connect() {
-      return navigator.bluetooth.requestDevice({filters:[{services:[ 'heart_rate' ]}]})
+      return navigator.bluetooth.requestDevice({filters:[{services:[ 'heart_rate' ]}, {services:[ 'device_information' ]}]})
       .then(device => {
+        console.log(device.uuids);
         this.device = device;
         return device.gatt.connect();
       })
@@ -27,6 +29,13 @@
     }
 
     /* Heart Rate Service */
+
+    getManufacturerName() {
+      return this.device.gatt.getPrimaryService("device_information")
+      .then(service => service.getCharacteristic("manufacturer_name_string"))
+      .then(characteristic => characteristic.readValue())
+      .then(value => this._textDecoder.decode(value));
+    }
 
     getBodySensorLocation() {
       return this._readCharacteristicValue('body_sensor_location')
